@@ -1,0 +1,96 @@
+const user = [ 
+
+];
+const {success,error} = require("../helper/baseResponse")
+// register API
+
+const register = (req,res)=>{
+    //error handling
+    //object distructuring
+    //validation
+    //return
+    try{
+        console.log(req.body)
+        const {username , email , password , cnfpassword} = req.body ;
+        const isEmailExist = user.filter((user)=> user.email === email)
+        if(!username) return res.status(422).json(error("username is requiresd", 422))
+        else if(!email) return res.status(422).json(error("email is required", 422))
+        else if(!password) return res.status(422).json(error("password is required", 422))
+        else if(!cnfpassword) return res.status(422).json(error("cnfpassword is required", 422))
+        // else if(!cnfpassword) return res.status(422).json(error("email is required", 422))
+        else if (password != cnfpassword) return res.status(422).json(error("password and cnfpassword doesn't match", 422))
+        else if (isEmailExist.length!=0) return res.status(422).json(error('user with this eamil: ${email}, already exist', 422))
+
+        else{
+            let body ={
+                ...req.body, 
+                id: user.length
+            }
+            user.push(body)
+            return res.status(201).json(success(`${username} registered successfully` , user, 201))
+        }
+        
+    }
+    catch(err){
+        return res.send(err.message)
+    }
+}
+
+
+
+const login=(req,res)=>{
+    try{
+        const {email, password} = req.body;
+        //validations
+        if(!email) return res.status(422).json(error("email is required", 422));
+        else if(!password) return res.status(422).json(error("password is required", 422));
+        else{
+            const isValidUser = user.filter((user)=>user.email === email);
+            if(isValidUser.length === 0 )return res.status(422).json(error(`user with this eamil: ${email}, doesn't created any account`, 422))
+            else{
+        if(isValidUser[0].password != password) return res.status(422).json(error("password doesn't match", 422))
+        else return res.status(201).json(success(`${isValidUser[0].username} , logged in successfully` , isValidUser[0] , 201))      
+    }
+            // console.log(isValidUser);
+            
+        }
+
+        
+    }catch(err){
+        return res.send(err.message)
+    }
+}
+
+module.exports = {register , login} 
+
+
+
+
+
+
+//ignore
+// try{
+//     console.log(req.body)
+//     const {username , email , password , cnfpassword} = req.body ;
+//     const isEmailExist = user.filter((user)=> user.email === email)
+//     if(!username) return res.send({error:true, message:"username is required"})
+//     else if(!email) return res.send({error:true, message:"email is required"})
+//     else if(!password) return res.send({error:true, message:"password is required"})
+//     else if(!cnfpassword) return res.send({error:true, message:"cnfpassword is required"})
+//     else if(!cnfpassword) return res.send({error:true, message:"cnfpassword is required"})
+//     else if (password != cnfpassword) return res.send({error: true, message:"Password and cnfpassword doesn't match"})
+//     else if (isEmailExist.length!=0) return res.send({error : true , message: 'user with this eamil: ${email}, already exist'})
+
+//     else{
+//         let body ={
+//             ...req.body, 
+//             id: user.length
+//         }
+//         user.push(body)
+//         return res.send({result: user , message:`${username} register successfully`})
+//     }
+    
+// }
+// catch(err){
+//     return res.send(err.message)
+// }
